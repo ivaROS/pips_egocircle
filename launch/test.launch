@@ -1,0 +1,23 @@
+<launch>
+  <arg name="param" default="/simplified_robot_description"/>
+    
+  <arg name="urdf_file" default="$(find xacro)/xacro '$(find turtlebot_trajectory_testing)/urdf/cylinder_model.urdf' --inorder" />
+  <param name="$(arg param)" command="$(arg urdf_file)" />
+
+  <!--<node name="pose_publisher" pkg="pips_visualization" type="pose_generator.py"/> -->
+
+  <group ns="visualization">
+    <node name="stand_alone_collision_checker" pkg="pips_egocircle" type="pips_egocircle_node">
+      <param name="egocircle_collision_checker/robot_model/param_name" value="$(arg param)"/>
+    </node>
+    
+    <node name="collision_point_pub" pkg="pips_visualization" type="collision_point_publisher.py">
+      <param name="service_name" value="/visualization/stand_alone_collision_checker/egocircle_collision_checker/test_collision"/>
+    </node>
+    
+    <node name="swept_volume_publisher" pkg="pips_egocircle" type="swept_volume_publisher.py">
+      <remap from="scan_in" to="/visualization/stand_alone_collision_checker/egocircle_collision_checker/hallucinated_scan"/>
+    </node>
+  </group>
+  
+</launch>
